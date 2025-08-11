@@ -1,6 +1,6 @@
 <?php
 header("Content-Type: application/json; charset=UTF-8");
-include_once $_SERVER['DOCUMENT_ROOT'].'/sdlc/api/db_connect.php';
+include_once __DIR__.'/../db_connect.php';
 
 $data = json_decode(file_get_contents("php://input"));
 $id = intval($data->id ?? 0);
