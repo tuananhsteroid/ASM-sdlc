@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giao Diện Shipper</title>
+    <link rel="stylesheet" href="assets/css/shipper.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+
+    <div class="header">
+        <div class="status-toggle">
+            <span class="status-text" id="status-text">Đang hoạt động</span>
+            <label class="switch">
+                <input type="checkbox" id="status-switch" checked>
+                <span class="slider round"></span>
+            </label>
+        </div>
+        <div class="user-info">
+            <i class="fas fa-user-circle"></i>
+            <span id="user-fullname">Nguyễn Văn A</span>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="map-placeholder">
+            <h3>Bản đồ</h3>
+        </div>
+
+        <div class="order-list">
+            <h2>Đơn hàng mới</h2>
+
+            <div class="order-card" data-order-id="1">
+                <div class="order-header">
+                    <span class="order-type">Giao đồ ăn</span>
+                    <span class="distance"><i class="fas fa-map-marker-alt"></i> 2.5 km</span>
+                </div>
+                <div class="order-details">
+                    <p><strong>Điểm lấy hàng:</strong> Cửa hàng ABC, 123 Đường XYZ</p>
+                    <p><strong>Điểm giao hàng:</strong> Tòa nhà DEF, 456 Đường QWE</p>
+                </div>
+                <div class="order-footer">
+                    <span class="price">Tổng tiền: 50.000 VNĐ</span>
+                    <button class="btn-accept">Chấp nhận</button>
+                </div>
+            </div>
+
+            <div class="order-card" data-order-id="2">
+                <div class="order-header">
+                    <span class="order-type">Giao hàng hỏa tốc</span>
+                    <span class="distance"><i class="fas fa-map-marker-alt"></i> 1.1 km</span>
+                </div>
+                <div class="order-details">
+                    <p><strong>Điểm lấy hàng:</strong> Kho hàng PQR, 789 Đường TUV</p>
+                    <p><strong>Điểm giao hàng:</strong> Nhà riêng GHI, 101 Đường JKL</p>
+                </div>
+                <div class="order-footer">
+                    <span class="price">Tổng tiền: 35.000 VNĐ</span>
+                    <button class="btn-accept">Chấp nhận</button>
+                </div>
+            </div>
+
+            <div class="order-card" data-order-id="3">
+                <div class="order-header">
+                    <span class="order-type">Giao đồ ăn</span>
+                    <span class="distance"><i class="fas fa-map-marker-alt"></i> 1.8 km</span>
+                </div>
+                <div class="order-details">
+                    <p><strong>Điểm lấy hàng:</strong> Tiệm trà sữa B, 111 Đường C</p>
+                    <p><strong>Điểm giao hàng:</strong> Chung cư D, 222 Đường E</p>
+                </div>
+                <div class="order-footer">
+                    <span class="price">Tổng tiền: 42.000 VNĐ</span>
+                    <button class="btn-accept">Chấp nhận</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('api/auth/session.php')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Phản hồi từ session.php:', data);
+
+                    if (data.success && data.loggedIn) {
+                        document.getElementById('user-fullname').textContent = data.user.fullname;
+
+                        if (data.user.role !== 'Shipper') {
+                            alert('Bạn không có quyền truy cập trang này.');
+                            window.location.href = 'login.html';
+                        }
+                    } else {
+                        window.location.href = 'login.html';
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi kiểm tra session:', error);
+                    window.location.href = 'login.html';
+                });
+        });
+
+    </script>
+</body>
+
+</html>

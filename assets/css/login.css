@@ -1,0 +1,73 @@
+/* --- Cài đặt chung --- */
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* --- Hình nền --- */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding: 20px;
+    /* Bạn có thể thay đổi ảnh nền tại đây */
+    background: url('https://images.unsplash.com/photo-1504754524776-8f4f37790774?q=80&w=2070') no-repeat center center;
+    background-size: cover;
+    position: relative;
+}
+
+/* Lớp phủ làm tối ảnh nền để form nổi bật hơn */
+.login-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5); 
+    z-index: 1;
+}
+
+/* --- Form đăng nhập --- */
+.login-form {
+    position: relative;
+    z-index: 2; /* Đảm bảo form nằm trên lớp phủ */
+    width: 100%;
+    max-width: 420px;
+    padding: 40px;
+    background: white;
+    border-radius: 15px; /* Bo góc nhiều hơn */
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+    transition: transform 0.3s ease-in-out;
+}
+
+.login-form:hover {
+    transform: scale(1.02); /* Hiệu ứng phóng to nhẹ khi di chuột */
+}
+
+/* --- Các thành phần trong form --- */
+.form-floating label {
+    color: #6c757d; /* Màu chữ cho label */
+}
+
+.form-control {
+    border-radius: 8px; /* Bo góc cho ô input */
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+}
+
+.btn-primary {
+    background: #dc3545; /* Màu đỏ đậm chủ đề đồ ăn */
+    border-color: #dc3545;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 1.1rem;
+    transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+    background: #c82333;
+    border-color: #bd2130;
+}

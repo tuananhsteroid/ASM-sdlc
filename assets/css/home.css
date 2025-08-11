@@ -1,0 +1,239 @@
+/* ====================================================== */
+/* CSS CHUNG CHO TOÀN BỘ TRANG WEB              */
+/* ====================================================== */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+.navbar {
+    z-index: 1030;
+}
+
+.nav-link.active {
+    font-weight: bold;
+    color: #e44d26 !important;
+    border-bottom: 2px solid #e44d26;
+}
+
+.hero-section {
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../images/hero-bg.jpg') no-repeat center center;
+    background-size: cover;
+    color: white;
+    padding: 100px 0;
+    text-align: center;
+}
+
+/* ====================================================== */
+/* CSS RIÊNG CHO SẢN PHẨM VÀ GIỎ HÀNG            */
+/* ====================================================== */
+
+/* === BỐ CỤC THẺ SẢN PHẨM === */
+.product-card {
+    height: 450px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    background-color: #fff;
+}
+
+/* === KHUNG CHỨA HÌNH ẢNH === */
+.product-image-wrapper {
+    position: relative; /* Đặt vị trí tương đối để mô tả nằm trong ảnh */
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
+}
+
+/* === ẢNH CÓ CÙNG KÍCH THƯỚC & TỈ LỆ === */
+.product-image-wrapper img,
+.product-card .card-img-top {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 0.25rem 0.25rem 0 0;
+}
+
+/* === NỘI DUNG CHÍNH (Tên SP, Giá, v.v.) === */
+.product-content {
+    flex-grow: 1;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* === GIÁ SP === */
+.price {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #e44d26;
+}
+
+/* === HIỆU ỨNG HOVER CARD === */
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* === MÔ TẢ KHI HOVER === */
+/* Đặt mô tả phủ lên hình ảnh và ẩn đi */
+.product-description-hover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    border-radius: 0.25rem 0.25rem 0 0;
+    text-align: center;
+    font-size: 0.9rem;
+    overflow-y: auto;
+}
+
+/* Chỉ hiển thị mô tả khi di chuột lên vùng ảnh */
+.product-image-wrapper:hover .product-description-hover {
+    opacity: 1;
+    visibility: visible;
+}
+
+
+/* ====================================================== */
+/* CSS CHO TRANG ADMIN                   */
+/* ====================================================== */
+.admin-main {
+    display: flex;
+    min-height: 100vh;
+}
+.admin-sidebar {
+    width: 250px;
+    background-color: #343a40;
+    color: white;
+    padding: 20px;
+    flex-shrink: 0;
+}
+.admin-content {
+    flex-grow: 1;
+    padding: 30px;
+}
+.admin-sidebar .nav-link {
+    color: rgba(255, 255, 255, 0.7);
+}
+.admin-sidebar .nav-link.active {
+    color: white;
+    background-color: #e44d26;
+    border-radius: 5px;
+}
+.table-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+.product-category-header {
+    padding: 10px 15px;
+    background-color: #e44d26;
+    color: white;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+.table-responsive {
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+}
+.btn-logout {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+}
+
+.cart-dropdown-container {
+    position: relative;
+    display: inline-block;
+}
+
+.mini-cart-dropdown {
+    position: absolute;
+    top: 100%; /* Đặt dưới nút giỏ hàng */
+    right: 0;
+    width: 300px;
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    z-index: 1000;
+    display: none; /* Mặc định ẩn */
+    padding: 10px;
+}
+
+.mini-cart-header {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+.mini-cart-items {
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.mini-cart-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.mini-cart-item:last-child {
+    border-bottom: none;
+}
+
+.mini-cart-item-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.mini-cart-item-details {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.mini-cart-item-name {
+    font-weight: 500;
+}
+
+.mini-cart-item-price {
+    font-weight: 700;
+    color: #e44d26; /* Thay màu phù hợp với theme của bạn */
+    white-space: nowrap;
+}
+
+.mini-cart-item-quantity {
+    color: #666;
+}
+
+.mini-cart-footer {
+    padding-top: 10px;
+}

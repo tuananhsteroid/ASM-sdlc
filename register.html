@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký | FoodDev - Khám phá thế giới ẩm thực</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/register.css">
+</head>
+<body>
+    <div class="register-wrapper">
+        <div class="left-pane">
+            <div class="brand-logo">FoodDev</div>
+            <h1>Hương vị tuyệt hảo...</h1>
+            <p>...giao tận cửa nhà bạn. Đăng ký ngay để không bỏ lỡ hàng ngàn ưu đãi hấp dẫn!</p>
+        </div>
+        <div class="right-pane">
+            <h2>Tạo tài khoản</h2>
+            <p class="subtitle">Bắt đầu hành trình ẩm thực của bạn!</p>
+            <form id="registrationForm">
+                <div class="input-group">
+                    <input type="text" id="fullName" class="input-field" placeholder="Họ và Tên" required>
+                    <i class="bi bi-person"></i>
+                </div>
+                <div class="input-group">
+                    <input type="email" id="email" class="input-field" placeholder="Địa chỉ Email" required>
+                    <i class="bi bi-envelope"></i>
+                </div>
+                <div class="input-group">
+                    <input type="tel" id="phone" class="input-field" placeholder="Số điện thoại" required>
+                    <i class="bi bi-telephone"></i>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="address" class="input-field" placeholder="Địa chỉ giao hàng" required>
+                    <i class="bi bi-geo-alt-fill"></i>
+                </div>
+                <div class="input-group">
+                    <input type="date" id="dateOfBirth" class="input-field" required>
+                    <i class="bi bi-calendar"></i>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="password" class="input-field" placeholder="Mật khẩu" required>
+                    <i class="bi bi-lock"></i>
+                </div>
+                <span id="password-error" class="error-message" style="display: none; color: red;"></span>
+                <div class="input-group">
+                    <input type="password" id="confirmPassword" class="input-field" placeholder="Xác nhận mật khẩu" required>
+                    <i class="bi bi-shield-lock"></i>
+                </div>
+                <span id="confirm-password-error" class="error-message" style="display: none; color: red;"></span>
+                <button type="submit" class="btn-submit">Tạo tài khoản ngay</button>
+            </form>
+            <div class="login-link">
+                <p>Đã có tài khoản? <a href="login.html">Đăng nhập</a></p>
+            </div>
+        </div>
+    </div>
+    <script src="assets/js/register.js"></script>
+</body>
+</html>

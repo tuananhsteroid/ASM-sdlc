@@ -1,0 +1,27 @@
+<div class="profile-card">
+    <h2 class="profile-title">Thông tin tài khoản</h2>
+    <div class="user-info">
+        <div class="info-item">
+            <i class="fas fa-user-circle"></i>
+            <p id="customer-name"></p>
+        </div>
+        <div class="info-item">
+            <i class="fas fa-envelope"></i>
+            <p id="customer-email"></p>
+        </div>
+        <div class="info-item">
+            <i class="fas fa-phone"></i>
+            <p id="customer-phone"></p>
+        </div>
+        <div class="info-item">
+            <i class="fas fa-birthday-cake"></i>
+            <p id="customer-dob"></p>
+        </div>
+    </div>
+    <div class="profile-actions">
+        <button class="btn-edit-profile">Chỉnh sửa hồ sơ</button>
+        <button class="btn-view-orders" onclick="loadContent('order_history.html')">Lịch sử mua hàng</button>
+        <button class="btn-logout">Đăng xuất</button>
+    </div>
+</div>
+<script src="assets/js/profile.js"></script>

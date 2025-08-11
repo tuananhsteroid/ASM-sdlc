@@ -1,0 +1,56 @@
+/* --- CSS CHO TRANG QUẢN LÝ SẢN PHẨM --- */
+
+.product-category-container {
+    background-color: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #dee2e6; /* Thêm viền nhẹ */
+    overflow: hidden; /* Giúp bo góc cho bảng bên trong */
+}
+
+.product-category-header {
+    padding: 12px 20px;
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #495057;
+    background-color: #f8f9fa; /* Nền xám nhạt cho tiêu đề */
+    border-bottom: 1px solid #dee2e6;
+}
+
+.table {
+    margin-bottom: 0; /* Bỏ khoảng cách dưới của bảng */
+}
+
+.table thead th {
+    background-color: #ffffff; /* Nền trắng cho header của bảng */
+    font-weight: 600;
+    color: #6c757d;
+    font-size: 0.9rem;
+    border-bottom-width: 1px; /* Làm cho đường kẻ header mỏng hơn */
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.table-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.btn-success {
+    background-color: #198754;
+    border-color: #198754;
+}
+/* Đảm bảo khung nội dung chính chiếm hết không gian */
+.admin-content {
+    width: 100%;
+}
+
+/* Yêu cầu các bảng sản phẩm phải dài ra theo chiều rộng */
+.product-category-container {
+    width: 100%;
+    max-width: 100%; /* Bỏ giới hạn chiều rộng tối đa nếu có */
+}

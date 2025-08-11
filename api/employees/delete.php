@@ -1,0 +1,21 @@
+<?php
+header("Content-Type: application/json; charset=UTF-8");
+require_once '../db_connect.php';
+
+$data = json_decode(file_get_contents("php://input"));
+$id = intval($data->id ?? 0);
+
+if ($id > 0) {
+    $stmt = $conn->prepare("DELETE FROM employees WHERE EmployeeID = ?");
+    $stmt->bind_param("i", $id);
+    if ($stmt->execute()) {
+        echo json_encode(["success" => true, "message" => "Xóa nhân viên thành công."]);
+    } else {
+        echo json_encode(["success" => false, "message" => "Xóa thất bại."]);
+    }
+    $stmt->close();
+} else {
+    echo json_encode(["success" => false, "message" => "ID không hợp lệ."]);
+}
+$conn->close();
+?>
