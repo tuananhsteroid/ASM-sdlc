@@ -215,8 +215,8 @@ async function renderUserActions() {
                     <ul class="dropdown-menu dropdown-menu-end shadow">
                         <li><h6 class="dropdown-header">${data.user.phone || 'Chưa có SĐT'}</h6></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="profile.html">Thông tin cá nhân</a></li>
-                        <li><a class="dropdown-item" href="order_history.html">Lịch sử đơn hàng</a></li>
+                        <li><a class="dropdown-item" href="${data.user.role === 'customer' ? 'profile.html' : (data.user.role === 'Shipper' ? 'shipper.html' : 'admin.html')}">Thông tin cá nhân</a></li>
+                        ${data.user.role === 'customer' ? '<li><a class="dropdown-item" href="order_history.html">Lịch sử đơn hàng</a></li>' : ''}
                         <li><hr class="dropdown-divider"></li>
                         <li><button class="dropdown-item" id="logout-btn">Đăng xuất</button></li>
                     </ul>

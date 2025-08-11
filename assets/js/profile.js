@@ -23,22 +23,38 @@ let isEditing = false;
 let originalUser = {};
 
 async function loadUserProfile() {
-    try {
-        const res = await fetch('api/user/read.php');
-        const data = await res.json();
+  try {
+    const res = await fetch('api/user/read.php');
+    const data = await res.json();
 
-        if (data.success && data.user) {
-            originalUser = {...data.user};
-            displayUserProfile(data.user);
-            if (data.user.Role !== 'customer') {
-                document.querySelector('.btn-edit-profile').style.display = 'none';
-            }
-        } else {
-            window.location.href = 'login.html';
-        }
-    } catch {
-        window.location.href = 'login.html';
+    if (data.success && data.user) {
+      originalUser = {...data.user};
+      displayUserProfile(data.user);
+      if (data.user.Role !== 'customer') {
+        document.querySelector('.btn-edit-profile').style.display = 'none';
+      }
+    } else {
+      const sessionRes = await fetch('api/auth/session.php');
+      const sessionData = await sessionRes.json();
+      if (sessionData.loggedIn && sessionData.user) {
+        const role = sessionData.user.role;
+        if (role === 'Shipper') { window.location.href = 'shipper.html'; return; }
+        if (role === 'admin') { window.location.href = 'admin.html'; return; }
+      }
+      window.location.href = 'login.html';
     }
+  } catch {
+    try {
+      const sessionRes = await fetch('api/auth/session.php');
+      const sessionData = await sessionRes.json();
+      if (sessionData.loggedIn && sessionData.user) {
+        const role = sessionData.user.role;
+        if (role === 'Shipper') { window.location.href = 'shipper.html'; return; }
+        if (role === 'admin') { window.location.href = 'admin.html'; return; }
+      }
+    } catch {}
+    window.location.href = 'login.html';
+  }
 }
 
 function displayUserProfile(user) {
