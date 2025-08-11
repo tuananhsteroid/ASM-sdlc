@@ -3,9 +3,7 @@
 header('Content-Type: application/json');
 session_start();
 
-
-include_once $_SERVER['DOCUMENT_ROOT'].'/sdlc/api/db_connect.php';
-
+include_once __DIR__.'/../db_connect.php';
 
 $response = [
     'success' => false,
@@ -30,7 +28,13 @@ if (!$conn) {
 }
 
 try {
-    $stmt = $conn->prepare("SELECT CustomerID, FullName, PhoneNumber, Email, DateOfBirth, Role FROM customeraccounts WHERE CustomerID = ?");
+    // Sửa tên bảng theo đúng phân biệt hoa/thường và đảm bảo có trường Role
+    $stmt = $conn->prepare("SELECT CustomerID, FullName, PhoneNumber, Email, DateOfBirth, 'customer' AS Role FROM CustomerAccounts WHERE CustomerID = ?");
+    if (!$stmt) {
+        $response['message'] = 'Lỗi chuẩn bị truy vấn: ' . $conn->error;
+        echo json_encode($response);
+        exit();
+    }
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
     $result = $stmt->get_result();

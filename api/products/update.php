@@ -1,6 +1,6 @@
 <?php
 header("Content-Type: application/json; charset=UTF-8");
-require_once '../db_connect.php';
+include_once __DIR__.'/../db_connect.php';
 
 $id = intval($_POST['id'] ?? 0);
 $name = $_POST['product_name'] ?? '';
