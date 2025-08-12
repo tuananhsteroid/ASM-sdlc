@@ -49,6 +49,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             case 'customers':
                 loadCustomers();
                 break;
+            case 'orders':
+                loadOrders();
+                break;
+            case 'revenue':
+                loadRevenue();
+                break;
             default:
                 document.getElementById('admin-page-title').textContent = 'Mục không xác định';
                 document.getElementById('admin-page-content').innerHTML = '<p>Chức năng này đang được phát triển.</p>';
@@ -314,7 +320,7 @@ function createEmployeeTableHTML(title, employees) {
                     <td>${emp.Email}</td>
                     <td>${emp.PhoneNumber}</td>
                     <td class="text-center">
-                        <button class="btn btn-sm btn-warning btn-edit-employee" data-id="${emp.EmployeeID}" title="Sửa"><i class="bi bi-pencil-fill"></i></button>
+                        <button class="btn btn-sm btn_WARNING btn-edit-employee" data-id="${emp.EmployeeID}" title="Sửa"><i class="bi bi-pencil-fill"></i></button>
                         <button class="btn btn-sm btn-danger btn-delete-employee" data-id="${emp.EmployeeID}" title="Xóa"><i class="bi bi-trash-fill"></i></button>
                     </td>
                 </tr>
@@ -497,5 +503,154 @@ async function loadCustomers() {
     } catch (error) {
         console.error('Lỗi tải khách hàng:', error);
         contentArea.innerHTML = '<div class="alert alert-danger">Không thể tải dữ liệu khách hàng.</div>';
+    }
+}
+
+// =============================
+// QUẢN LÝ ĐƠN HÀNG (ADMIN)
+// =============================
+async function loadOrders() {
+    const pageTitle = document.getElementById('admin-page-title');
+    const contentArea = document.getElementById('admin-page-content');
+
+    pageTitle.textContent = 'Quản lý Đơn hàng';
+    contentArea.innerHTML = '<div class="d-flex justify-content-center mt-5"><div class="spinner-border" role="status"></div></div>';
+
+    try {
+        const response = await fetch('api/orders/read.php');
+        const result = await response.json();
+
+        if (!result.success) {
+            contentArea.innerHTML = `<div class="alert alert-danger">${result.message || 'Không thể tải dữ liệu đơn hàng.'}</div>`;
+            return;
+        }
+
+        const orders = result.orders || [];
+
+        let tableRows = '';
+        if (orders.length > 0) {
+            orders.forEach(order => {
+                const totalVnd = Number(order.OrderTotal || 0).toLocaleString('vi-VN');
+                tableRows += `
+                    <tr>
+                        <td>${order.OrderID}</td>
+                        <td>${order.CustomerName || '<em>Khách lẻ</em>'}</td>
+                        <td>${order.OrderDate}</td>
+                        <td><span class="badge bg-${order.Status === 'Chờ xác nhận' ? 'warning' : 'success'}">${order.Status || 'N/A'}</span></td>
+                        <td class="text-end">${totalVnd}đ</td>
+                        <td class="text-center">${order.ItemCount || 0}</td>
+                    </tr>
+                `;
+            });
+        } else {
+            tableRows = '<tr><td colspan="6" class="text-center text-muted">Chưa có đơn hàng nào</td></tr>';
+        }
+
+        contentArea.innerHTML = `
+            <div class="d-flex justify-content_between align-items-center mb-4">
+                <h2 class="m-0">Danh sách đơn hàng</h2>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 8%;">Mã ĐH</th>
+                            <th style="width: 22%;">Khách hàng</th>
+                            <th style="width: 18%;">Ngày đặt</th>
+                            <th style="width: 14%;">Trạng thái</th>
+                            <th style="width: 18%;" class="text-end">Tổng tiền</th>
+                            <th style="width: 10%;" class="text-center">Số món</th>
+                        </tr>
+                    </thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+            </div>
+        `;
+    } catch (error) {
+        console.error('Lỗi tải đơn hàng:', error);
+        contentArea.innerHTML = '<div class="alert alert-danger">Không thể tải dữ liệu đơn hàng.</div>';
+    }
+}
+
+// =============================
+// THỐNG KÊ DOANH THU (ADMIN)
+// =============================
+async function loadRevenue() {
+    const pageTitle = document.getElementById('admin-page-title');
+    const contentArea = document.getElementById('admin-page-content');
+
+    pageTitle.textContent = 'Báo cáo Doanh thu';
+    contentArea.innerHTML = '<div class="d-flex justify-content-center mt-5"><div class="spinner-border" role="status"></div></div>';
+
+    try {
+        const response = await fetch('api/revenue/summary.php');
+        const result = await response.json();
+
+        if (!result.success) {
+            contentArea.innerHTML = `<div class="alert alert-danger">${result.message || 'Không thể tải dữ liệu doanh thu.'}</div>`;
+            return;
+        }
+
+        const totalRevenue = Number(result.totalRevenue || 0).toLocaleString('vi-VN');
+        const totalOrders = Number(result.totalOrders || 0);
+
+        // Bảng doanh thu 7 ngày gần nhất
+        const daily = result.revenueByDay || [];
+        let dailyRows = '';
+        if (daily.length > 0) {
+            daily.forEach(item => {
+                dailyRows += `
+                    <tr>
+                        <td>${item.date}</td>
+                        <td class="text-end">${Number(item.revenue).toLocaleString('vi-VN')}đ</td>
+                        <td class="text-center">${item.orders}</td>
+                    </tr>
+                `;
+            });
+        } else {
+            dailyRows = '<tr><td colspan="3" class="text-center text-muted">Không có dữ liệu</td></tr>';
+        }
+
+        contentArea.innerHTML = `
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">Tổng doanh thu</h5>
+                            <p class="display-6 text-success m-0">${totalRevenue}đ</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">Tổng số đơn hàng</h5>
+                            <p class="display-6 text-primary m-0">${totalOrders}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Doanh thu 7 ngày gần nhất</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Ngày</th>
+                                    <th class="text-end">Doanh thu</th>
+                                    <th class="text-center">Số đơn</th>
+                                </tr>
+                            </thead>
+                            <tbody>${dailyRows}</tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        console.error('Lỗi tải doanh thu:', error);
+        contentArea.innerHTML = '<div class="alert alert-danger">Không thể tải dữ liệu doanh thu.</div>';
     }
 }

@@ -21,7 +21,7 @@
         </div>
         <div class="user-info">
             <i class="fas fa-user-circle"></i>
-            <span id="user-fullname">Nguyễn Văn A</span>
+            <span id="user-fullname"></span>
         </div>
     </div>
 
@@ -32,68 +32,26 @@
 
         <div class="order-list">
             <h2>Đơn hàng mới</h2>
-
-            <div class="order-card" data-order-id="1">
-                <div class="order-header">
-                    <span class="order-type">Giao đồ ăn</span>
-                    <span class="distance"><i class="fas fa-map-marker-alt"></i> 2.5 km</span>
-                </div>
-                <div class="order-details">
-                    <p><strong>Điểm lấy hàng:</strong> Cửa hàng ABC, 123 Đường XYZ</p>
-                    <p><strong>Điểm giao hàng:</strong> Tòa nhà DEF, 456 Đường QWE</p>
-                </div>
-                <div class="order-footer">
-                    <span class="price">Tổng tiền: 50.000 VNĐ</span>
-                    <button class="btn-accept">Chấp nhận</button>
-                </div>
+            <div id="new-orders-list">
+                <div class="loading-message">Đang tải đơn hàng mới...</div>
             </div>
-
-            <div class="order-card" data-order-id="2">
-                <div class="order-header">
-                    <span class="order-type">Giao hàng hỏa tốc</span>
-                    <span class="distance"><i class="fas fa-map-marker-alt"></i> 1.1 km</span>
-                </div>
-                <div class="order-details">
-                    <p><strong>Điểm lấy hàng:</strong> Kho hàng PQR, 789 Đường TUV</p>
-                    <p><strong>Điểm giao hàng:</strong> Nhà riêng GHI, 101 Đường JKL</p>
-                </div>
-                <div class="order-footer">
-                    <span class="price">Tổng tiền: 35.000 VNĐ</span>
-                    <button class="btn-accept">Chấp nhận</button>
-                </div>
-            </div>
-
-            <div class="order-card" data-order-id="3">
-                <div class="order-header">
-                    <span class="order-type">Giao đồ ăn</span>
-                    <span class="distance"><i class="fas fa-map-marker-alt"></i> 1.8 km</span>
-                </div>
-                <div class="order-details">
-                    <p><strong>Điểm lấy hàng:</strong> Tiệm trà sữa B, 111 Đường C</p>
-                    <p><strong>Điểm giao hàng:</strong> Chung cư D, 222 Đường E</p>
-                </div>
-                <div class="order-footer">
-                    <span class="price">Tổng tiền: 42.000 VNĐ</span>
-                    <button class="btn-accept">Chấp nhận</button>
-                </div>
-            </div>
-
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Kiểm tra phiên đăng nhập và vai trò
             fetch('api/auth/session.php')
                 .then(response => response.json())
                 .then(data => {
-                    console.log('Phản hồi từ session.php:', data);
-
                     if (data.success && data.loggedIn) {
                         document.getElementById('user-fullname').textContent = data.user.fullname;
 
                         if (data.user.role !== 'Shipper') {
                             alert('Bạn không có quyền truy cập trang này.');
                             window.location.href = 'login.html';
+                        } else {
+                            loadNewOrders(); // Chỉ tải đơn hàng nếu là shipper
                         }
                     } else {
                         window.location.href = 'login.html';
@@ -105,6 +63,80 @@
                 });
         });
 
+        async function loadNewOrders() {
+            const orderListEl = document.getElementById('new-orders-list');
+            orderListEl.innerHTML = '<div class="loading-message">Đang tải đơn hàng mới...</div>';
+
+            try {
+                const res = await fetch('api/shipper/read_new_orders.php');
+                const data = await res.json();
+
+                if (data.success && data.orders.length > 0) {
+                    displayNewOrders(data.orders);
+                } else {
+                    orderListEl.innerHTML = '<div class="no-orders-message">Hiện không có đơn hàng mới.</div>';
+                }
+            } catch (e) {
+                orderListEl.innerHTML = '<div class="error-message">Lỗi khi tải đơn hàng. Vui lòng thử lại.</div>';
+                console.error("Lỗi khi tải đơn hàng mới:", e);
+            }
+        }
+
+        function displayNewOrders(orders) {
+            const orderListEl = document.getElementById('new-orders-list');
+            orderListEl.innerHTML = ''; // Xóa thông báo loading
+
+            orders.forEach(order => {
+                const orderHtml = `
+                    <div class="order-card" data-order-id="${order.OrderID}">
+                        <div class="order-header">
+                            <span class="order-type">Đơn hàng #${order.OrderID}</span>
+                            <span class="distance"><i class="fas fa-map-marker-alt"></i> ${order.Distance} km</span>
+                        </div>
+                        <div class="order-details">
+                            <p><strong>Khách hàng:</strong> ${order.CustomerName}</p>
+                            <p><strong>Điểm lấy hàng:</strong> ${order.PickupAddress}</p>
+                            <p><strong>Điểm giao hàng:</strong> ${order.DeliveryAddress}</p>
+                        </div>
+                        <div class="order-footer">
+                            <span class="price">Tổng tiền: ${Number(order.TotalPrice).toLocaleString('vi-VN')} VNĐ</span>
+                            <button class="btn-accept" data-id="${order.OrderID}">Chấp nhận</button>
+                        </div>
+                    </div>
+                `;
+                orderListEl.innerHTML += orderHtml;
+            });
+            
+            // Gắn trình xử lý sự kiện cho nút "Chấp nhận"
+            orderListEl.addEventListener('click', async (e) => {
+                const acceptBtn = e.target.closest('.btn-accept');
+                if (acceptBtn) {
+                    const orderId = acceptBtn.dataset.id;
+                    if (confirm(`Bạn có chắc muốn chấp nhận đơn hàng #${orderId}?`)) {
+                        await acceptOrder(orderId);
+                    }
+                }
+            });
+        }
+
+        async function acceptOrder(orderId) {
+            try {
+                const response = await fetch('api/shipper/accept_order.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ orderId: orderId })
+                });
+                const result = await response.json();
+                alert(result.message);
+                if (result.success) {
+                    // Cập nhật lại danh sách đơn hàng sau khi chấp nhận
+                    loadNewOrders(); 
+                }
+            } catch (error) {
+                console.error('Lỗi khi chấp nhận đơn hàng:', error);
+                alert('Lỗi khi kết nối đến máy chủ.');
+            }
+        }
     </script>
 </body>
 

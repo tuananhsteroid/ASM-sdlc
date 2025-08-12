@@ -87,6 +87,7 @@ function renderProductsByCategory(products) {
     }
 
     initAddToCartListeners();
+    initBuyNowListeners();
 }
 
 function renderProductSection(containerId, products) {
@@ -111,7 +112,7 @@ function renderProductSection(containerId, products) {
                             <span class="price d-block mb-2">${Number(product.Price).toLocaleString('vi-VN')}₫</span>
                             <div class="d-grid gap-2">
                                 <button class="btn btn-primary add-to-cart" data-id="${product.ProductID}">Thêm vào giỏ</button>
-                                <button class="btn btn-outline-secondary">Mua ngay</button>
+                                <button class="btn btn-outline-secondary buy-now" data-id="${product.ProductID}">Mua ngay</button>
                             </div>
                         </div>
                     </div>
@@ -151,6 +152,7 @@ function handleSearch(searchTerm) {
     if (filtered.length > 0) {
         renderProductSection('search-results-grid', filtered);
         initAddToCartListeners();
+        initBuyNowListeners();
     } else {
         document.getElementById('search-results-grid').innerHTML = '<p class="col-12 text-center text-muted">Không tìm thấy sản phẩm nào.</p>';
     }
@@ -313,7 +315,139 @@ function initAddToCartListeners() {
     });
 }
 
-async function addToCart(productId) {
+function initBuyNowListeners() {
+    document.querySelectorAll('.buy-now').forEach(button => {
+        button.addEventListener('click', async (e) => {
+            const productId = e.currentTarget.dataset.id;
+            if (!productId) {
+                alert('Không tìm thấy ID sản phẩm.');
+                return;
+            }
+
+            try {
+                const session = await fetch('api/auth/session.php');
+                const sessionData = await session.json();
+
+                if (!sessionData.loggedIn) {
+                    // Dùng điều hướng thay vì alert/confirm mặc định
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // Thêm vào giỏ ở chế độ im lặng (không alert)
+                const added = await addToCart(productId, false);
+                if (added) {
+                    openBuyNowModal();
+                }
+            } catch (err) {
+                // Không dùng alert để tránh popup mặc định
+                console.error('Lỗi buy-now:', err);
+            }
+        });
+    });
+}
+
+let buyNowModalInstance = null;
+
+function ensureBuyNowModal() {
+    let modal = document.getElementById('buyNowModal');
+    if (!modal) {
+        const modalHtml = `
+<div class="modal fade" id="buyNowModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Xác nhận thanh toán</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="buy-now-modal-body">
+        Bạn có chắc chắn muốn thanh toán đơn hàng này không?
+      </div>
+      <div class="modal-footer" id="buy-now-modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="button" class="btn btn-primary" id="buy-now-confirm-btn">Xác nhận</button>
+      </div>
+    </div>
+  </div>
+</div>`;
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = modalHtml;
+        document.body.appendChild(wrapper.firstElementChild);
+        modal = document.getElementById('buyNowModal');
+    }
+    if (!buyNowModalInstance) {
+        // eslint-disable-next-line no-undef
+        buyNowModalInstance = new bootstrap.Modal(modal);
+    }
+    return modal;
+}
+
+function openBuyNowModal() {
+    const modal = ensureBuyNowModal();
+    const bodyEl = document.getElementById('buy-now-modal-body');
+    const footerEl = document.getElementById('buy-now-modal-footer');
+    const confirmBtn = document.getElementById('buy-now-confirm-btn');
+
+    // Reset nội dung modal mỗi lần mở
+    if (bodyEl) bodyEl.textContent = 'Bạn có chắc chắn muốn thanh toán đơn hàng này không?';
+    if (footerEl) footerEl.innerHTML = `
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="button" class="btn btn-primary" id="buy-now-confirm-btn">Xác nhận</button>
+    `;
+
+    // Gắn lại handler xác nhận (one-time)
+    const newConfirmBtn = document.getElementById('buy-now-confirm-btn');
+    if (newConfirmBtn) {
+        newConfirmBtn.addEventListener('click', async () => {
+            await checkoutViaModal();
+        }, { once: true });
+    }
+
+    buyNowModalInstance.show();
+}
+
+async function checkoutViaModal() {
+    const bodyEl = document.getElementById('buy-now-modal-body');
+    const footerEl = document.getElementById('buy-now-modal-footer');
+
+    if (bodyEl) {
+        bodyEl.innerHTML = `
+            <div class="d-flex align-items-center gap-2">
+                <div class="spinner-border spinner-border-sm" role="status"></div>
+                <span>Đang xử lý thanh toán...</span>
+            </div>
+        `;
+    }
+    if (footerEl) footerEl.innerHTML = '';
+
+    try {
+        const response = await fetch('api/cart/checkout.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({})
+        });
+        const result = await response.json();
+
+        if (bodyEl) bodyEl.textContent = result.message || 'Đã xử lý xong.';
+        if (footerEl) {
+            footerEl.innerHTML = `
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Đóng</button>
+                ${result.success ? '<a href="order_history.html" class="btn btn-outline-primary">Xem đơn hàng</a>' : ''}
+            `;
+        }
+
+        if (result.success) {
+            await updateCartCount();
+            await renderMiniCart();
+        }
+    } catch (error) {
+        if (bodyEl) bodyEl.textContent = 'Đã có lỗi xảy ra trong quá trình thanh toán. Vui lòng thử lại.';
+        if (footerEl) footerEl.innerHTML = '<button type="button" class="btn btn-primary" data-bs-dismiss="modal">Đóng</button>';
+        console.error('Lỗi khi thanh toán:', error);
+    }
+}
+
+async function addToCart(productId, showFeedback = true) {
     try {
         const response = await fetch('api/cart/add.php', {
             method: 'POST',
@@ -321,13 +455,22 @@ async function addToCart(productId) {
             body: JSON.stringify({ productId })
         });
         const result = await response.json();
-        alert(result.message);
+        if (showFeedback) {
+            alert(result.message);
+        }
 
         if (result.success) {
             await updateCartCount();
             await renderMiniCart();
+            return true;
         }
+        return false;
     } catch (err) {
-        alert('Lỗi khi thêm vào giỏ.');
+        if (showFeedback) {
+            alert('Lỗi khi thêm vào giỏ.');
+        } else {
+            console.error('Lỗi khi thêm vào giỏ:', err);
+        }
+        return false;
     }
 }
