@@ -3,7 +3,7 @@
 header('Content-Type: application/json');
 session_start();
 
-include_once $_SERVER['DOCUMENT_ROOT'].'/sdlc/api/db_connect.php';
+include_once __DIR__.'/../db_connect.php';
 
 
 $response = [

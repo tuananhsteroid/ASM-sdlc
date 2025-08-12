@@ -28,8 +28,8 @@ if (!$conn) {
 }
 
 try {
-    // Sửa tên bảng theo đúng phân biệt hoa/thường và đảm bảo có trường Role
-    $stmt = $conn->prepare("SELECT CustomerID, FullName, PhoneNumber, Email, DateOfBirth, 'customer' AS Role FROM CustomerAccounts WHERE CustomerID = ?");
+    // Sửa tên bảng theo đúng phân biệt hoa/thường và đảm bảo có trường Role + Address
+    $stmt = $conn->prepare("SELECT CustomerID, FullName, PhoneNumber, Email, Address, DateOfBirth, 'customer' AS Role FROM CustomerAccounts WHERE CustomerID = ?");
     if (!$stmt) {
         $response['message'] = 'Lỗi chuẩn bị truy vấn: ' . $conn->error;
         echo json_encode($response);

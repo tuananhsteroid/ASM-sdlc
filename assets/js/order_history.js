@@ -27,26 +27,32 @@ function displayOrderHistory(orders) {
 
     orders.forEach(order => {
         const orderHtml = `
-            <div class="order-item">
+            <div class="order-card">
                 <div class="order-header">
-                    <strong>Mã đơn hàng: #${order.OrderID}</strong>
-                    <span>Ngày đặt: ${order.OrderDate}</span>
-                    <span class="order-status">${order.Status}</span>
+                    <span class="order-id">Đơn hàng #${order.OrderID}</span>
+                    <span class="order-date">Ngày đặt: ${order.OrderDate}</span>
+                    <span class="order-status ${order.Status === 'completed' ? 'completed' : 'pending'}">${order.Status}</span>
                 </div>
-                <div class="order-details">
+                <div class="order-items">
                     ${order.order_details.map(detail => `
-                        <div class="order-detail-item">
-                            <img src="${detail.ImageURL}" alt="${detail.ProductName}" class="product-image">
-                            <div class="product-info">
-                                <p class="product-name">${detail.ProductName}</p>
-                                <p class="product-quantity">Số lượng: ${detail.Quantity}</p>
-                                <p class="product-price">${Number(detail.PriceAtPurchase).toLocaleString('vi-VN')}₫</p>
+                        <div class="order-item">
+                            <img src="${detail.ImageURL}" alt="${detail.ProductName}" class="item-image">
+                            <div class="item-details">
+                                <span class="item-name">${detail.ProductName}</span>
+                                <span class="item-price">${detail.Quantity} x ${Number(detail.PriceAtPurchase).toLocaleString('vi-VN')}₫</span>
                             </div>
                         </div>
                     `).join('')}
+                </div>
+                <div class="order-footer">
+                    <span class="order-total">Tổng tiền: ${calculateOrderTotal(order.order_details).toLocaleString('vi-VN')}₫</span>
                 </div>
             </div>
         `;
         orderListEl.innerHTML += orderHtml;
     });
+}
+
+function calculateOrderTotal(orderDetails) {
+    return orderDetails.reduce((total, item) => total + (item.Quantity * item.PriceAtPurchase), 0);
 }
