@@ -5,7 +5,6 @@ session_start();
 
 include_once __DIR__.'/../db_connect.php';
 
-
 $response = [
     'success' => false,
     'message' => ''
@@ -18,23 +17,27 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = (int) $_SESSION['user_id'];
-$data = json_decode(file_get_contents('php://input'), true);
+$data = json_decode(file_get_contents('php://input'), true) ?: [];
 
-if (
-    empty($data['FullName']) ||
-    !isset($data['PhoneNumber']) ||
-    !isset($data['DateOfBirth'])
-) {
-    $response['message'] = 'Thiếu dữ liệu bắt buộc.';
+// Cho phép cập nhật từng phần, nhưng cần ít nhất một trường hợp lệ
+$allowedFields = ['FullName', 'PhoneNumber', 'DateOfBirth', 'Address'];
+$updates = [];
+$params = [];
+$types = '';
+
+foreach ($allowedFields as $field) {
+    if (array_key_exists($field, $data)) {
+        $updates[] = "$field = ?";
+        $params[] = trim((string)$data[$field]);
+        $types .= 's';
+    }
+}
+
+if (empty($updates)) {
+    $response['message'] = 'Không có dữ liệu để cập nhật.';
     echo json_encode($response);
     exit();
 }
-
-$fullname = trim($data['FullName']);
-$phone = trim($data['PhoneNumber']);
-$dob = trim($data['DateOfBirth']);
-
-// Có thể thêm validate ngày tháng, phone nếu muốn
 
 if (!$conn) {
     $response['message'] = 'Lỗi kết nối cơ sở dữ liệu.';
@@ -43,15 +46,25 @@ if (!$conn) {
 }
 
 try {
-    $stmt = $conn->prepare("UPDATE customeraccounts SET FullName = ?, PhoneNumber = ?, DateOfBirth = ? WHERE CustomerID = ?");
-    $stmt->bind_param("sssi", $fullname, $phone, $dob, $user_id);
+    $sql = "UPDATE customeraccounts SET " . implode(', ', $updates) . " WHERE CustomerID = ?";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        throw new Exception('Lỗi chuẩn bị truy vấn: ' . $conn->error);
+    }
+
+    // Bind dynamic params
+    $types .= 'i';
+    $params[] = $user_id;
+    $stmt->bind_param($types, ...$params);
     $stmt->execute();
 
     if ($stmt->affected_rows > 0) {
-        // Cập nhật session nếu cần
-        $_SESSION['fullname'] = $fullname;
-        $_SESSION['phone'] = $phone;
-
+        if (isset($data['FullName'])) {
+            $_SESSION['fullname'] = $data['FullName'];
+        }
+        if (isset($data['PhoneNumber'])) {
+            $_SESSION['phone'] = $data['PhoneNumber'];
+        }
         $response['success'] = true;
         $response['message'] = 'Cập nhật thông tin thành công.';
     } else {
@@ -64,3 +77,4 @@ try {
 
 echo json_encode($response);
 $conn->close();
+?>

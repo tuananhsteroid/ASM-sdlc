@@ -1,6 +1,6 @@
 <?php
 header("Content-Type: application/json; charset=UTF-8");
-require_once '../db_connect.php';
+include_once __DIR__.'/../db_connect.php';
 
 // --- HÀM KIỂM TRA MẬT KHẨU ---
 function validatePassword($password) {

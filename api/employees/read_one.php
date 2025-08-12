@@ -2,7 +2,7 @@
 // api/employees/read_one.php
 
 header("Content-Type: application/json; charset=UTF-8");
-require_once '../db_connect.php'; 
+include_once __DIR__.'/../db_connect.php'; 
 
 $id = intval($_GET['id'] ?? 0);
 $employee = null;

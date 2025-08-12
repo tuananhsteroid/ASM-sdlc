@@ -483,3 +483,11 @@ body {
 .profile-actions .btn {
   padding: 10px 16px;
 }
+
+.order-history-container .order-item .item-image {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}

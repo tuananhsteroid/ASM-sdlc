@@ -80,7 +80,7 @@ function displayUserProfile(user) {
     const addressList = document.getElementById('address-list');
     if (addressList) {
         const displayAddress = user.Address && user.Address.trim() !== '' ? user.Address : 'Chưa cập nhật';
-        addressList.innerHTML = `<div class="address-item">${displayAddress}</div>`;
+        addressList.innerHTML = `<div class="address-item" id="customer-address">${displayAddress}</div>`;
     }
 }
 
@@ -89,6 +89,7 @@ function toggleEditMode() {
     const nameEl = document.getElementById('customer-name');
     const phoneEl = document.getElementById('customer-phone');
     const dobEl = document.getElementById('customer-dob');
+    const addressItem = document.getElementById('customer-address');
 
     if (!isEditing) {
         isEditing = true;
@@ -99,6 +100,9 @@ function toggleEditMode() {
         nameEl.innerHTML = `<input id="input-name" type="text" value="${originalUser.FullName}">`;
         phoneEl.innerHTML = `Số điện thoại: <input id="input-phone" type="text" value="${originalUser.PhoneNumber || ''}">`;
         dobEl.innerHTML = `Ngày sinh: <input id="input-dob" type="date" value="${originalUser.DateOfBirth || ''}">`;
+        if (addressItem) {
+            addressItem.innerHTML = `<input id="input-address" type="text" class="form-control" placeholder="Địa chỉ" value="${(originalUser.Address || '').replace(/"/g, '&quot;')}">`;
+        }
     } else {
         isEditing = false;
         btn.textContent = 'Chỉnh sửa hồ sơ';
@@ -110,17 +114,22 @@ function toggleEditMode() {
 }
 
 async function saveUserProfile() {
-    const updatedData = {
-        FullName: document.getElementById('input-name').value.trim(),
-        PhoneNumber: document.getElementById('input-phone').value.trim(),
-        DateOfBirth: document.getElementById('input-dob').value.trim()
-    };
+    const payload = {};
+    const nameInput = document.getElementById('input-name');
+    const phoneInput = document.getElementById('input-phone');
+    const dobInput = document.getElementById('input-dob');
+    const addressInput = document.getElementById('input-address');
+
+    if (nameInput) payload.FullName = nameInput.value.trim();
+    if (phoneInput) payload.PhoneNumber = phoneInput.value.trim();
+    if (dobInput) payload.DateOfBirth = dobInput.value.trim();
+    if (addressInput) payload.Address = addressInput.value.trim();
 
     try {
         const res = await fetch('api/user/update.php', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(updatedData)
+            body: JSON.stringify(payload)
         });
 
         const result = await res.json();

@@ -43,10 +43,9 @@ if (
     // Nếu là khách hàng, đếm số lượng sản phẩm trong giỏ
     if ($_SESSION['role'] === 'customer') {
         $stmt = $conn->prepare("
-            SELECT SUM(od.Quantity)
-            FROM orders o
-            JOIN order_details od ON o.OrderID = od.OrderID
-            WHERE o.CustomerID = ? AND o.Status = 'cart'
+            SELECT SUM(ci.Quantity)
+            FROM cart_items ci
+            WHERE ci.CustomerID = ?
         ");
 
         if ($stmt) {
